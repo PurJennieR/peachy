@@ -107,7 +107,7 @@ allClearButtons.addEventListener("click", button => {
     calculator.updateDisplay();
 });
 
-deleteButtons.addEventListener("click", button => {
+//deleteButtons.addEventListener("click", button => {
     calculator.delete();
     calculator.updateDisplay();
 });
