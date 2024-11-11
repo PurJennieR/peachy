@@ -1,10 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="peachy.js]" type="text/javascript">
- //array การนำข้อมูลใหม่ไปต่อท้ายข้อมูลเดิมที่มีอยู่แล้ว
+//array การนำข้อมูลใหม่ไปต่อท้ายข้อมูลเดิมที่มีอยู่แล้ว
 let ages = [50,80,90]
 ages.push(60)
 console.log = (ages)
@@ -45,10 +39,3 @@ for (let index=1 ; index < name_list.length; index++){
     { age:40,name :'jane',grade : 'C'},
     { age:25,name :'sompong',grade : 'D'}
  ]
-    </script>
-    <title>Document</title>
-</head>
-<body>
-    
-</body>
-</html>
