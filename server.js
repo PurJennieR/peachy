@@ -1,80 +1,56 @@
-const express = require('express')
-const app = express()
-const bodyparser = require('body-parser')
+const express = require('express');
+const bodyParser = require('body-parser');
+const mysql = require('mysql2');
 
-app.use(bodyparser.json()) 
+const app = express();
+app.use(bodyParser.json());
+app.use(express.static((__dirname, 'public')));
 
-const port = 8000
-let users = []
-let count = 1
+// การเชื่อมต่อฐานข้อมูล
+const db = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    password: '',
+    database: 'booking_system'
+});
 
-// path = / เรียกข้อมูลทั้งหมด
-app.get('/users',(req,res)=>{
-   const fillter = users.map(user=>{
-    return {
-        id:user.id,
-        firstname : user.firstname,
-        lastname : user.lastname,
-        fullname : user.firstname + " " + user.lastname
+db.connect(err => {
+    if (err) {
+        console.error('Database connection failed:', err);
+        return;
     }
-   })
-   res.json(fillter)
-})
+    console.log('Connected to MySQL database');
+});
 
-//สร้างข้อมูล และ กำหนด ID ให้ข้อมูล
-app.post('/user',(req,res)=>{
-    let user = req.body
-    user.id = count
-    count += 1
-    users.push(user)
-
-    res.json({
-        message : 'add complete',
-        data : user
-    })
-})
-
-// เรียกข้อมูลออกมาโดยระบุตามไอดี
-app.get('/users/:id',(req,res)=>{
-    let id = req.params.id
-    res.send(id)
-})
-
-// Update ข้อมูล โดยใช้ path และ id เพื่อระบุข้อมูลที่จะแก้ 
-app.put('/users/:id',(req,res)=>{
-    let id = req.params.id
-    let updateUser = req.body
-
-    // หา users จาก id ที่ส่งมา
-    let selecetindex = users.findIndex(user.id == id)
-
-    // update user นั้น
-    users[selecetindex].firstname = updateUser.firstname || users[selecetindex].firstname
-    users[selecetindex].lastname = updateUser.lastname || users[selecetindex].lastname
-    users[selecetindex].age = updateUser.age || users[selecetindex].age
-    users[selecetindex].gender = updateUser.gender || users[selecetindex].gender
-
-    res.json({
-        massage : 'Update user complate !!' ,
-        data :{
-            user : updateUser,
-            indexUpdate : selecetindex
+// ดึงข้อมูลห้องจากฐานข้อมูล
+app.get('/api/rooms', (req, res) => {
+    db.query('SELECT room_number FROM rooms', (err, results) => {
+        if (err) {
+            console.error('Failed to fetch rooms:', err);
+            res.status(500).json({ error: 'Failed to fetch rooms' });
+            return;
         }
-    })
-})
+        res.json({ rooms: results });
+    });
+});
 
+// บันทึกการจองห้อง
+app.post('/api/book', (req, res) => {
+    const { name, room, checkin, checkout } = req.body;
 
-app.listen(port,(req,res)=>{
-    console.log("https run at " + port)
-}
+    const query = 'INSERT INTO bookings (name, room_number, checkin, checkout) VALUES (?, ?, ?, ?)';
+    db.query(query, [name, room, checkin, checkout], (err) => {
+        if (err) {
+            console.error('Failed to book room:', err);
+            res.status(500).json({ error: 'Failed to book room' });
+            return;
+        }
+        res.status(201).json({ message: 'Booking successful' });
+    });
+});
 
-app.delete('/users/:id',(req,res)=>{
-    let id = req.params.id
-    let selecetindex = user.findIndex(user => user.id == id)
-
-    user.splice(selecetindex,1)
-
-    res.json
-        message ; "delete complete",
-        indexDelete ; selecetindex
-})
+// เริ่มเซิร์ฟเวอร์
+const PORT = 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
